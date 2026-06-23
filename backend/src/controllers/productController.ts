@@ -94,3 +94,68 @@ export async function getProductsByCategoryController(
     });
   }
 }
+
+export async function paginatedProductsController(
+  req: Request,
+  res: Response
+) {
+  try {
+    const cursorId = req.query.cursorId as string | undefined;
+    const limit = Number(req.query.limit) || 20;
+
+    let products;
+
+    if (!cursorId) {
+      products = await prisma.product.findMany({
+        take: limit,
+        orderBy: [
+          {
+            updatedAt: "desc",
+          },
+          {
+            id: "desc",
+          },
+        ],
+      });
+    } else {
+      products = await prisma.product.findMany({
+        take: limit,
+        skip: 1,
+        cursor: {
+          id: BigInt(cursorId),
+        },
+        orderBy: [
+          {
+            updatedAt: "desc",
+          },
+          {
+            id: "desc",
+          },
+        ],
+      });
+    }
+
+    const formattedProducts = products.map((product) => ({
+      ...product,
+      id: product.id.toString(),
+    }));
+
+    const lastProduct = products[products.length - 1];
+
+    return res.json({
+      success: true,
+      data: formattedProducts,
+      nextCursor: lastProduct
+        ? lastProduct.id.toString()
+        : null,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching paginated products",
+    });
+  }
+}
+
