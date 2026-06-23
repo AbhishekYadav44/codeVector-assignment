@@ -10,20 +10,6 @@ const PORT = process.env.PORT;
  
 app.use(express.json())
 
-app.get('/', async (req, res) => {
-  try {
-    const data = await prisma.product.findFirst({
-        where :{ 
-            category : "Books"
-        }
-    });
-    console.log(data)
-    res.json({ data });
-  } catch (error) {
-    console.error('Database error:', error);
-    res.status(500).json({ error: 'Database connection failed' });
-  }
-});
 
 app.use("/",productRoutes)
 
