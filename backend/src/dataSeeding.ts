@@ -24,19 +24,25 @@ function generateProducts(start: number, end: number) {
 
 export  async function seed() {
   console.log("Seeding started...");
+for (let i = 1; i <= TOTAL; i += BATCH_SIZE) {
+  const batch = generateProducts(
+    i,
+    Math.min(i + BATCH_SIZE, TOTAL + 1)
+  );
 
-  for (let i = 0; i < TOTAL; i += BATCH_SIZE) {
-    const batch = generateProducts(i, i + BATCH_SIZE);
+  await prisma.product.createMany({
+    data: batch,
+    skipDuplicates: true,
+  });
 
-    await prisma.product.createMany({
-      data: batch,
-      skipDuplicates: true,
-    });
-
-    console.log(`inserted ${i + BATCH_SIZE}/${TOTAL}`);
-  }
-
-  console.log("seeding complete ");
+  console.log(
+    `inserted ${Math.min(
+      i + BATCH_SIZE - 1,
+      TOTAL
+    )}/${TOTAL}`
+  );
+}
+console.log("seeding completed!")
   
 }
 
