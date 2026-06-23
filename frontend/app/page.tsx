@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Card from "./components/Card";
+import { BACKEND_URL } from "@/config";
+
 
 type Product = {
   id: string;
@@ -38,7 +40,7 @@ export default function Home() {
       setLoading(true);
 
       let url =
-        "http://localhost:3000/products-cursor?limit=10";
+        `${BACKEND_URL}/products-cursor?limit=10`;
 
       if (cursor) {
         url += `&cursorId=${cursor.id}`;
@@ -99,7 +101,7 @@ export default function Home() {
  const handleUpdate = async (id: string) => {
   try {
     const res = await fetch(
-      `http://localhost:3000/products/${id}`,
+      `${BACKEND_URL}/products/${id}`,
       {
         method: "PUT",
         headers: {
@@ -138,7 +140,7 @@ export default function Home() {
       if (!confirmDelete) return;
 
       await fetch(
-        `http://localhost:3000/products/${id}`,
+        `${BACKEND_URL}/products/${id}`,
         {
           method: "DELETE",
         }
